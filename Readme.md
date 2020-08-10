@@ -67,4 +67,4 @@ The pins on the microSD card reader, from top to bottom, are:
 
 This should work with any of the commonly available microSD card readers, I do however think that the IMU has to be a Grove IMU 10DOF v2, otherwise you'll have to swap out the library used in the code.
 
-The connections at the top right should go to the center pin and the surrounding contact on the camera hotshoe, the order doesn't matter. See ISO 10330 for more details.
+The connections at the top right should go to the camera hotshoe where the black wire (GND) goes to the U-shaped bracket and the yellow wire (D2) goes to the center pin. See ISO 10330 for more details.
