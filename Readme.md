@@ -50,3 +50,21 @@ cmake -DCMAKE_BUILD_TYPE=Release ../test
 make
 ./tests
 ```
+
+## Arduino Setup
+
+Apologies to all EE students for this ugly schematic.
+
+![schematic](schematic/arduino-gravity-recorder_bb.png)
+
+The pins on the microSD card reader, from top to bottom, are:
+* CS
+* SCK
+* MOSI
+* MISO
+* VCC
+* GND
+
+This should work with any of the commonly available microSD card readers, I do however think that the IMU has to be a Grove IMU 10DOF v2, otherwise you'll have to swap out the library used in the code.
+
+The connections at the top right should go to the center pin and the surrounding contact on the camera hotshoe, the order doesn't matter. See ISO 10330 for more details.
