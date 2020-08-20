@@ -10,6 +10,7 @@
 constexpr long serial_baud = 9600;
 constexpr uint8_t chipselect_pin = 10;
 constexpr uint8_t photo_pin = 2;
+constexpr uint8_t led_pin = 6;
 constexpr uint32_t clock_frequency_I2C = 400000; // 400kHz
 
 constexpr unsigned int gravity_record_nr = 26;
@@ -30,6 +31,17 @@ struct photo_state_t {
 void photo_interrupt() {
 	photo_state.time = millis();
 	photo_state.pending = true;
+}
+
+struct led_state_t {
+	bool on = false;
+	unsigned long turnoff_time = 0;
+} led_state;
+
+void blink_led() {
+	digitalWrite(led_pin, HIGH);
+	led_state.on = true;
+	led_state.turnoff_time = millis() + 150;
 }
 
 SDLib::File logfile;
@@ -60,6 +72,9 @@ void setup() {
 	Wire.begin();
 	Wire.setClock(clock_frequency_I2C);
 
+	pinMode(led_pin, OUTPUT);
+	digitalWrite(led_pin, LOW);
+
 	pinMode(photo_pin, INPUT_PULLUP);
 	attachInterrupt(digitalPinToInterrupt(photo_pin), photo_interrupt, FALLING);
 
@@ -70,6 +85,9 @@ void setup() {
 		serial_println("SD ok");
 
 		logfile = SDLib::SD.open("gravity.txt", FILE_WRITE);
+
+		blink_led();
+
 	} else {
 		serial_println("SD failed");
 
@@ -103,6 +121,12 @@ void loop() {
 		get_acc(gravity_state.buffer.push());
 	}
 
+	// Check LED state
+	if (led_state.on && millis_at_iter_start > led_state.turnoff_time) {
+		led_state.on = false;
+		digitalWrite(led_pin, LOW);
+	}
+
 	// Handle a photo event -> write info to SD
 	if (photo_state.pending) {
 		// Write gravity vectors and current time to sd. The whole
@@ -118,5 +142,8 @@ void loop() {
 
 		gravity_state.buffer.clear();
 		gravity_state.next_record_time = 0;
+
+		serial_println("photo");
+		blink_led();
 	}
 }
