@@ -8,4 +8,6 @@ IndentPPDirectives: BeforeHash
 
 AlwaysBreakTemplateDeclarations: true
 
+PointerAlignment: Left
+
 AccessModifierOffset: -4
