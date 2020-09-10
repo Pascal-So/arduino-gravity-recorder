@@ -13,27 +13,29 @@
 #include <fmt/core.h>
 
 Eigen::Quaternionf parse_calib(std::string const& calib) {
-	std::vector<float> vals;
-	vals.reserve(4);
+	Eigen::Quaternionf quat;
 
 	std::istringstream ss(calib);
+	int index = 0;
 	float f;
 	while (ss >> f) {
-		vals.push_back(f);
-
+		// Eigen stores quaternion as xyzw internally for some reason
+		quat.coeffs()((index + 3) % 4) = f;
 		if (ss.peek() == ',')
 			ss.ignore();
 
-		if (vals.size() >= 4)
+		++index;
+		if (index >= 4)
 			break;
 	}
 
-	if (vals.size() < 4) {
+	ss.peek();
+	if (index != 4 || !ss.eof()) {
 		throw std::invalid_argument(
 		    "Invalid calib string. Should be 4 comma separated floats.");
 	}
 
-	return Eigen::Quaternionf(vals[0], vals[1], vals[2], vals[3]);
+	return quat;
 }
 
 std::string serialize_calib(Eigen::Quaternionf const& calib) {
@@ -71,7 +73,6 @@ void show_session_detail(std::ifstream& recording_infile,
 				    measurements.size() - nr_skip_measurements;
 				for (int i = 0; i < nr_relevant_measurements; ++i)
 					g += measurements[i];
-				g /= nr_relevant_measurements;
 				g.normalize();
 
 				for (int i = 0; i < 3; ++i) {
@@ -128,7 +129,7 @@ void list_sessions(std::ifstream& recording_infile) {
 		switch (entry_type) {
 		case log_entry_types::photo_event:
 			last_photo_time_in_session = parse_photo(recording_infile).millis;
-			++ photos_in_session;
+			++photos_in_session;
 			break;
 		case log_entry_types::startup:
 			parse_startup(recording_infile);
@@ -139,7 +140,7 @@ void list_sessions(std::ifstream& recording_infile) {
 
 			photos_in_session = 0;
 			last_photo_time_in_session = 0;
-			++ session_index;
+			++session_index;
 			break;
 		case log_entry_types::gravity_vector:
 			parse_gravity(recording_infile);
