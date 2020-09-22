@@ -33,7 +33,10 @@ inline photo_t parse_photo(std::ifstream& recording_infile) {
 inline gravity_t parse_gravity(std::ifstream& recording_infile) {
 	Eigen::Matrix<int16_t, 3, 1> int_vec;
 	recording_infile.read(reinterpret_cast<char *>(int_vec.data()), sizeof(int16_t) * 3);
-	return {int_vec.cast<float>()};
+
+	// The stored data is acceleration but we need the force which
+	// is in the opposite direction.
+	return {int_vec.cast<float>() * -1};
 }
 
 inline bool read_next_entry(std::ifstream& recording_infile,

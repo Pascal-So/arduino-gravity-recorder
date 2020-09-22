@@ -1,5 +1,8 @@
 # Recording Parser
 
+Calibration on Sony a7sII: 0.009561,0.009946,-0.691912,-0.721304, old -0.000052,0.022178,-0.687245,-0.726000
+Calibration on Canon EOS 600D: 0.005083,0.010376,-0.693853,-0.719637
+
 ## Data Analysis
 
 Here's a useful gnuplot palette that shows big differences for the last 4 out of 26 values.
@@ -160,3 +163,16 @@ Sony a7sII, heavy lens (Sigma 24-70mm F2.8 DG DN Art), handheld
 0.0481404 -0.136974 -0.989404
 ```
 
+## Useful tools
+
+Extract timestamps in ms from Canon images.
+```bash
+exiftool * | grep "Date Created" | sed -E 's/^.*([0-9]{4}):(..):(.*)$/\1-\2-\3/' | date -f - +"%s%N" | cut -c-13
+```
+
+Gravity vectors from Panda Robot ground truth.
+```matlab
+ee_to_camera = [0 1 0; -1 0 0; 0 0 1]
+# poses is of shape n*16
+vecs = (ee_to_camera * -poses(:,[3,7,11])')'
+```
