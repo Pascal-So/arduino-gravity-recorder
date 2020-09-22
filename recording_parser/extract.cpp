@@ -14,6 +14,8 @@ void extract(std::ifstream& recording_infile, int extract_session_index,
              Eigen::Quaternionf const& calibration) {
 	const fs::path extract_path(extract_destination);
 
+	int nr_photos_extracted = 0;
+
 	if (!fs::is_directory(extract_path)) {
 		throw std::invalid_argument("Path " + extract_destination +
 		                            " does not exist.");
@@ -29,18 +31,20 @@ void extract(std::ifstream& recording_infile, int extract_session_index,
 		if (path.extension() == ".txt" || path.extension() == "")
 			continue;
 
-		files.push_back(path);
+		files.push_back(path.filename());
 	}
+
+	if (files.empty())
+		throw std::invalid_argument("Directory " + extract_destination +
+		                            " doesn't contain any photos.");
+
+	std::cout << "Directory contains " << files.size() << " photos.\n";
 
 	// We assume that the files have ascending names, which might be wrong if
 	// the file numbering of the camera resets. A smarter way would be to
 	// compare the timestamps of the photos to the times of the measurements,
 	// might do that at some later point.
 	std::sort(files.begin(), files.end());
-
-	if (files.empty())
-		throw std::invalid_argument("Directory " + extract_destination +
-		                            " doesn't contain any photos.");
 
 	int session_index = -1;
 	unsigned photo_index = 0;
@@ -74,8 +78,11 @@ void extract(std::ifstream& recording_infile, int extract_session_index,
 
 				const auto txt_path =
 				    extract_path / files[photo_index].replace_extension(".txt");
+
 				std::ofstream os(txt_path, std::ios::trunc);
 				os << g(0) << ' ' << g(1) << ' ' << g(2) << '\n';
+
+				++nr_photos_extracted;
 			}
 
 			++photo_index;
@@ -96,4 +103,6 @@ void extract(std::ifstream& recording_infile, int extract_session_index,
 
 	if (extract_session_index > session_index)
 		throw std::invalid_argument("Invalid session index.");
+
+	std::cout << "Extracted data for " << nr_photos_extracted << " photos.\n";
 }
