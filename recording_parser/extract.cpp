@@ -62,6 +62,11 @@ void extract(std::ifstream& recording_infile, int extract_session_index,
 		case log_entry_types::photo_event:
 			parse_photo(recording_infile).millis;
 
+			if (measurements.size() < 3) {
+				measurements.clear();
+				break;
+			}
+
 			if (session_index == extract_session_index) {
 				if (photo_index >= files.size()) {
 					throw std::runtime_error(

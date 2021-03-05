@@ -58,6 +58,10 @@ void show_session_detail(std::ifstream& recording_infile,
 		switch (entry_type) {
 		case log_entry_types::photo_event: {
 			const auto photo_time = parse_photo(recording_infile).millis;
+			if (measurements.size() < 3) {
+				measurements.clear();
+				break;
+			}
 			if (session_index == show_session_index) {
 				fmt::print("{: >5d}   {: >12d}  {: >9.2f}", photos_in_session,
 				           measurements.size(), photo_time / 1000.);
