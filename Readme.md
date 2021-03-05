@@ -14,13 +14,24 @@ For the recording_parser you'll also need Eigen 3.3.
 
 ## Compilation
 
-First, check which serial port your Arduino is connected to.
+Setup the arduino-cli environment.
+
+```bash
+arduino-cli config init
+arduino-cli core update-index
+arduino-cli core install arduino:avr
+arduino-cli lib install SD
+```
+
+Note that this will create the directories `~/.arduino15` and `~/Arduino`.
+
+Check which serial port your Arduino is connected to.
 
 ```bash
 arduino-cli board list
 ```
 
-This step will automatically fetch the [Arduino-CMake-Toolchain](https://github.com/a9183756-gh/Arduino-CMake-Toolchain), compile the code, and upload it to your Arduino Nano.
+This next step will automatically fetch the [Arduino-CMake-Toolchain](https://github.com/a9183756-gh/Arduino-CMake-Toolchain), compile the code, and upload it to your Arduino Nano.
 
 ```bash
 mkdir build
